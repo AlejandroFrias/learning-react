@@ -104,7 +104,7 @@ function LandingPage() {
 
   return (
     <Container maxWidth="md">
-      <TextField onKeyPress={(e) => handleEnter(e)} placeholder="search..." />
+      <TextField defaultValue={searchParams.get("search")} onKeyPress={(e) => handleEnter(e)} placeholder="search..." />
       <VehicleList error={error} isLoaded={isLoaded} items={items}/>
     </Container>
   );
