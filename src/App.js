@@ -94,7 +94,11 @@ function LandingPage() {
 
   let handleEnter = (e) => {
     if (e.code === "Enter") {
-      setSearchParams({search: e.target.value})
+      if (e.target.value) {
+        setSearchParams({search: e.target.value})
+      } else {
+        setSearchParams({})
+      }
     }
   }
 
