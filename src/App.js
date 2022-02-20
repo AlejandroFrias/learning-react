@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
@@ -15,6 +15,8 @@ import TableRow from '@mui/material/TableRow'
 import TableContainer from '@mui/material/TableContainer'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography';
+import { useSearchParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 
 function VehicleList(props) {
@@ -52,31 +54,27 @@ function VehicleList(props) {
 }
 
 
-function handleEnter (e, setQueryParams) {
+function handleEnter (e, setQueryParams, setSearchParams) {
   if (e.code === "Enter") {
-    setQueryParams({search: e.target.value})
+    setQueryParams(e.target.value)
+    setSearchParams({search: e.target.value})
   }
 }
 
-function Search(props) {
-  return (
-    <TextField onKeyPress={(e) => handleEnter(e, props.callBack)} placeholder="search..." />
-  )
-}
-     
 function buildUrl(queryParams) {
   let url = "https://61fd98fca58a4e00173c95f7.mockapi.io/api/vehicles"
-  if (queryParams.search) {
-    url += "/?search=" + queryParams.search
+  if (queryParams) {
+    url += "/?search=" + queryParams
   }
   return url
 }
 
-export default function App() {
+function LandingPage() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
-  const [queryParams, setQueryParams] = useState({});
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [queryParams, setQueryParams] = useState(searchParams.get("search"));
 
   // Note: the empty deps array [] means
   // this useEffect will run once
@@ -97,12 +95,29 @@ export default function App() {
           setError(error);
         }
       )
-  }, [queryParams])
+  }, [searchParams])
+
+  // let updateParams = (v) => {
+  //   setSearchParams(v);
+  //   setQueryParams(v);
+  // }
 
   return (
     <Container maxWidth="md">
-      <Search callBack={setQueryParams}/>
+      <TextField onKeyPress={(e) => handleEnter(e, setQueryParams, setSearchParams)} placeholder="search..." />
       <VehicleList error={error} isLoaded={isLoaded} items={items}/>
     </Container>
   );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+        </Routes>
+      </Suspense>
+    </Router>
+  )
 }
