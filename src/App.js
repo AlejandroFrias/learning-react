@@ -52,14 +52,15 @@ function VehicleList(props) {
 }
 
 
-function handleEnter (e) {
-  if (e.name === "Enter") {
-   props.setQueryParams({search: props.value})
+function handleEnter (e, setQueryParams) {
+  if (e.code === "Enter") {
+    setQueryParams({search: e.target.value})
   }
 }
+
 function Search(props) {
   return (
-    <TextField  placeholder="search..." />
+    <TextField onKeyPress={(e) => handleEnter(e, props.callBack)} placeholder="search..." />
   )
 }
      
@@ -96,11 +97,11 @@ export default function App() {
           setError(error);
         }
       )
-  }, [])
+  }, [queryParams])
 
   return (
     <Container maxWidth="md">
-      <Search />
+      <Search callBack={setQueryParams}/>
       <VehicleList error={error} isLoaded={isLoaded} items={items}/>
     </Container>
   );
