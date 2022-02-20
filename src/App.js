@@ -54,17 +54,13 @@ function VehicleList(props) {
 }
 
 
-function handleEnter (e, setQueryParams, setSearchParams) {
-  if (e.code === "Enter") {
-    setQueryParams(e.target.value)
-    setSearchParams({search: e.target.value})
-  }
-}
 
-function buildUrl(queryParams) {
+function buildUrl(searchParams) {
   let url = "https://61fd98fca58a4e00173c95f7.mockapi.io/api/vehicles"
-  if (queryParams) {
-    url += "/?search=" + queryParams
+  if (searchParams) {
+    if (searchParams.get("search")) {
+      url += "/?search=" + searchParams.get("search");
+    }
   }
   return url
 }
@@ -74,13 +70,12 @@ function LandingPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [queryParams, setQueryParams] = useState(searchParams.get("search"));
 
   // Note: the empty deps array [] means
   // this useEffect will run once
   // similar to componentDidMount()
   useEffect(() => {
-    fetch(buildUrl(queryParams))
+    fetch(buildUrl(searchParams))
       .then(res => res.json())
       .then(
         (result) => {
@@ -97,14 +92,15 @@ function LandingPage() {
       )
   }, [searchParams])
 
-  // let updateParams = (v) => {
-  //   setSearchParams(v);
-  //   setQueryParams(v);
-  // }
+  let handleEnter = (e) => {
+    if (e.code === "Enter") {
+      setSearchParams({search: e.target.value})
+    }
+  }
 
   return (
     <Container maxWidth="md">
-      <TextField onKeyPress={(e) => handleEnter(e, setQueryParams, setSearchParams)} placeholder="search..." />
+      <TextField onKeyPress={(e) => handleEnter(e)} placeholder="search..." />
       <VehicleList error={error} isLoaded={isLoaded} items={items}/>
     </Container>
   );
